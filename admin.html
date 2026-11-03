@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Time HoldCo — Master Administration Portal & REST API Console</title>
+    <meta name="description" content="Manage all content, hero, portfolio, press, footer, socials and test REST APIs in real time.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' fill='%23000000'/><path d='M14 10 L28 20 L14 30 Z' fill='%23ffffff'/><rect x='27' y='10' width='4' height='20' fill='%23ffffff'/></svg>">
+
+    <style>
+        :root {
+            --bg-void: #07080a;
+            --bg-canvas: #0c0e12;
+            --bg-surface: #141720;
+            --bg-elevated: #1b202c;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --border-medium: rgba(255, 255, 255, 0.16);
+            --border-active: #ffffff;
+            --text-pure: #ffffff;
+            --text-heading: #f0f2f8;
+            --text-muted: #8e95aa;
+            --text-dim: #5c6275;
+            --accent-green: #00ff88;
+            --accent-blue: #3b82f6;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --font-display: 'Oswald', sans-serif;
+            --font-body: 'Roboto', sans-serif;
+            --font-mono: 'Space Grotesk', monospace;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --transition: all 0.25s ease;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-heading);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        /* SIDEBAR */
+        .admin-sidebar {
+            width: 280px;
+            background-color: var(--bg-void);
+            border-right: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .sidebar-brand svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .sidebar-brand-name {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .sidebar-brand-badge {
+            font-family: var(--font-mono);
+            font-size: 9px;
+            padding: 2px 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .sidebar-nav {
+            padding: 20px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .nav-category {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            padding: 12px 14px 4px;
+        }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .sidebar-btn:hover {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .sidebar-btn.active {
+            color: #ffffff;
+            background: var(--bg-surface-elevated);
+            border-color: var(--border-subtle);
+            font-weight: 600;
+        }
+
+        .sidebar-btn svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+
+        .sidebar-btn.active svg {
+            opacity: 1;
+        }
+
+        .sidebar-btn .badge-counter {
+            margin-left: auto;
+            background: var(--accent-green);
+            color: #000000;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 10px;
+        }
+
+        .sidebar-footer {
+            padding: 18px;
+            border-top: 1px solid var(--border-subtle);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-live-view {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #000000;
+            padding: 10px;
+            border-radius: 6px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: var(--transition);
+        }
+
+        .btn-live-view:hover {
+            background: #d4d4d8;
+        }
+
+        /* MAIN CONTENT AREA */
+        .admin-main {
+            margin-left: 280px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* TOPBAR */
+        .admin-topbar {
+            height: 70px;
+            background-color: var(--bg-void);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 90;
+        }
+
+        .topbar-title-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .sync-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--accent-green);
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
+
+        .sync-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 6px var(--accent-green);
+        }
+
+        .topbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-ghost:hover {
+            color: #ffffff;
+            border-color: var(--border-medium);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* VIEW CONTAINER */
+        .view-content {
+            padding: 36px 40px;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* KPI METRIC CARDS */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 32px;
+        }
+
+        .kpi-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: var(--transition);
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-medium);
+            transform: translateY(-2px);
+        }
+
+        .kpi-label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: 36px;
+            font-weight: 700;
+            color: #ffffff;
+            line-height: 1;
+        }
+
+        .kpi-subtext {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 6px;
+        }
+
+        /* CONTENT HEADER ROW */
+        .content-header-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .section-headline {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .section-subheadline {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .btn-primary-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-primary-action:hover {
+            background: #e2e2e8;
+            transform: translateY(-1px);
+        }
+
+        /* DATA TABLES */
+        .table-wrapper {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            margin-bottom: 30px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .admin-table th {
+            background: rgba(0, 0, 0, 0.4);
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .admin-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border-subtle);
+            color: var(--text-heading);
+            vertical-align: middle;
+        }
+
+        .admin-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .admin-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .company-td-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #ffffff;
+            display: block;
+        }
+
+        .company-td-url {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-dim);
+        }
+
+        .badge-pill {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+        }
+
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-table-action {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-muted);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-table-action:hover {
+            color: #ffffff;
+            border-color: var(--border-medium);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-table-action.delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* SETTINGS FORM STYLES */
+        .settings-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 30px;
+            margin-bottom: 24px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-grid.full {
+            grid-template-columns: 1fr;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field label {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+        }
+
+        .form-field input, .form-field textarea, .form-field select {
+            background: var(--bg-void);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 10px 14px;
+            color: #ffffff;
+            font-family: var(--font-body);
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition);
+        }
+
+        .form-field input:focus, .form-field textarea:focus, .form-field select:focus {
+            border-color: var(--border-active);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        /* API CONSOLE SPECIFIC STYLES */
+        .api-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 18px;
+        }
+
+        .api-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .method-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .method-get { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .method-post { background: rgba(0, 255, 136, 0.2); color: #00ff88; border: 1px solid rgba(0, 255, 136, 0.4); }
+        .method-put { background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .method-delete { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+        .api-endpoint {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .api-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 14px;
+        }
+
+        .api-code-block {
+            background: #08090c;
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #d1d5db;
+            overflow-x: auto;
+            margin-bottom: 14px;
+        }
+
+        .btn-try-api {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-medium);
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-try-api:hover {
+            background: #ffffff;
+            color: #000000;
+        }
+
+        .api-result-box {
+            display: none;
+            margin-top: 12px;
+            background: #050608;
+            border: 1px solid #242938;
+            border-radius: 6px;
+            padding: 12px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: #a7f3d0;
+            max-height: 240px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        /* MODALS */
+        .admin-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 500;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .admin-modal.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-medium);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-box-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 14px;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal-close:hover { color: #ffffff; }
+
+        /* TOAST */
+        .toast-notify {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #ffffff;
+            color: #000000;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 9999;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none;
+        }
+
+        .toast-notify.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 8L28 20L12 32V8Z" fill="#FFFFFF"/>
+                <rect x="28" y="8" width="4" height="24" fill="#FFFFFF"/>
+            </svg>
+            <div class="sidebar-brand-name">Play Time</div>
+            <div class="sidebar-brand-badge">ADMIN</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-category">Main Dashboard</div>
+            <button class="sidebar-btn active" onclick="switchTab('overview')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Overview & Metrics</span>
+            </button>
+
+            <div class="nav-category">Content Modules</div>
+            <button class="sidebar-btn" onclick="switchTab('hero')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+                <span>Hero Headline & Logo</span>
+            </button>
+            <button class="sidebar-btn" onclick="switchTab('portfolio')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                <span>Portfolio Companies</span>
+            </button>
+            <button class="sidebar-btn" onclick="switchTab('press')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1m2 13a2 2 0 0 1-2-2V7m2 13a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+                <span>Press & Media</span>
+            </button>
+            <button class="sidebar-btn" onclick="switchTab('footer')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span>Footer & Socials</span>
+            </button>
+            <button class="sidebar-btn" onclick="switchTab('settings')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>SEO & Meta Settings</span>
+            </button>
+
+            <div class="nav-category">API & Developer</div>
+            <button class="sidebar-btn" onclick="switchTab('api-docs')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                <span>All REST APIs & Console</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="index.html" target="_blank" class="btn-live-view">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span>View Public Site &rarr;</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="admin-main">
+        <!-- TOPBAR -->
+        <header class="admin-topbar">
+            <div class="topbar-title-box">
+                <h1 class="page-title" id="pageTitleDisplay">Dashboard Overview</h1>
+                <div class="sync-indicator">
+                    <span class="sync-dot"></span>
+                    <span>REST API Live (Port 8888)</span>
+                </div>
+            </div>
+
+            <div class="topbar-actions">
+                <a href="/api/export" class="btn-ghost" title="Download backup data.json">Export JSON</a>
+                <button onclick="document.getElementById('importFile').click()" class="btn-ghost">Import JSON</button>
+                <input type="file" id="importFile" style="display:none" accept=".json" onchange="handleImportFile(event)">
+                <button onclick="handleResetDefaults()" class="btn-ghost" style="color:var(--accent-red);">Reset Defaults</button>
+            </div>
+        </header>
+
+        <!-- VIEW PANES -->
+        <main class="view-content">
+
+            <!-- 1. OVERVIEW DASHBOARD -->
+            <div class="tab-pane active" id="pane-overview">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>Portfolio Startups</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div class="kpi-value" id="kpiCount">8</div>
+                        <div class="kpi-subtext">Active holding & venture allocations</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>Fund Target</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        </div>
+                        <div class="kpi-value">$200M</div>
+                        <div class="kpi-subtext">Silicon Valley Holding Vehicle</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>Press Mentions</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 20H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v1"/></svg>
+                        </div>
+                        <div class="kpi-value" id="kpiPressCount">4</div>
+                        <div class="kpi-subtext">Bloomberg, TechCrunch, etc.</div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-label">
+                            <span>REST API Endpoints</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                        </div>
+                        <div class="kpi-value">14</div>
+                        <div class="kpi-subtext">Full CRUD operations enabled</div>
+                    </div>
+                </div>
+
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">Current Portfolio Startups</h2>
+                        <p class="section-subheadline">Real-time status of portfolio companies rendered on index.html</p>
+                    </div>
+                    <button onclick="switchTab('portfolio')" class="btn-primary-action">Manage Startups</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Startup</th>
+                                <th>One-Line Thesis</th>
+                                <th>Website</th>
+                                <th>Preview</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overviewTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. HERO HEADLINE & LOGO -->
+            <div class="tab-pane" id="pane-hero">
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">Hero Section Typography & Logo</h2>
+                        <p class="section-subheadline">Controls the opening statement and brand mark of Play Time</p>
+                    </div>
+                    <button onclick="saveHeroSettings()" class="btn-primary-action">Save Hero Settings</button>
+                </div>
+
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Headline Part 1 (Regular Weight)</label>
+                            <input type="text" id="heroInputTitle1" value="At the intersection">
+                        </div>
+                        <div class="form-field">
+                            <label>Headline Part 2 (Bold Accent)</label>
+                            <input type="text" id="heroInputTitle2" value="of Sports & Technology">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full" style="margin-top: 18px;">
+                        <div class="form-field">
+                            <label>Hero Brand Logo (SVG or Image URL)</label>
+                            <input type="text" id="heroInputLogoUrl" value="https://cdn.prod.website-files.com/633c180b60b06867471a6354/6346a74e759e2a8a337b0dd5_Playtime.svg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. PORTFOLIO MANAGER -->
+            <div class="tab-pane" id="pane-portfolio">
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">All Portfolio Companies</h2>
+                        <p class="section-subheadline">Add, edit, reorder or delete company split-sections</p>
+                    </div>
+                    <button onclick="openCompanyModal()" class="btn-primary-action">+ Add Company</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Order</th>
+                                <th>Company</th>
+                                <th>Thesis / Tagline</th>
+                                <th>Website URL</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolioTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. PRESS & MEDIA -->
+            <div class="tab-pane" id="pane-press">
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">Press Articles & Media Highlights</h2>
+                        <p class="section-subheadline">Articles and publications featured in the footer column</p>
+                    </div>
+                    <button onclick="openPressModal()" class="btn-primary-action">+ Add Press</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Source / Title</th>
+                                <th>Summary</th>
+                                <th>Link</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pressTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. FOOTER & SOCIALS -->
+            <div class="tab-pane" id="pane-footer">
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">Footer & Social Coordinates</h2>
+                        <p class="section-subheadline">Contact email address, footer logo and external social profiles</p>
+                    </div>
+                    <button onclick="saveFooterSettings()" class="btn-primary-action">Save Footer</button>
+                </div>
+
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Inquiry Email Address</label>
+                            <input type="email" id="footerInputEmail" value="hello@playtime.vc">
+                        </div>
+                        <div class="form-field">
+                            <label>Footer Brand Logo URL</label>
+                            <input type="text" id="footerInputLogo" value="https://cdn.prod.website-files.com/633c180b60b06867471a6354/6346a74e759e2a8a337b0dd5_Playtime.svg">
+                        </div>
+                    </div>
+
+                    <div class="form-grid" style="margin-top: 18px;">
+                        <div class="form-field">
+                            <label>X / Twitter Profile URL</label>
+                            <input type="url" id="footerInputTwitter" value="https://twitter.com/playtime">
+                        </div>
+                        <div class="form-field">
+                            <label>Instagram Profile URL</label>
+                            <input type="url" id="footerInputInstagram" value="https://www.instagram.com/playtime">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full" style="margin-top: 18px;">
+                        <div class="form-field">
+                            <label>LinkedIn Company URL</label>
+                            <input type="url" id="footerInputLinkedin" value="https://www.linkedin.com/company/playtimevc/">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. SEO & META SETTINGS -->
+            <div class="tab-pane" id="pane-settings">
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">Page SEO & Meta Settings</h2>
+                        <p class="section-subheadline">Browser title, meta description, and favicon icons</p>
+                    </div>
+                    <button onclick="saveMetaSettings()" class="btn-primary-action">Save SEO Settings</button>
+                </div>
+
+                <div class="settings-card">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Page Title (&lt;title&gt;)</label>
+                            <input type="text" id="metaInputTitle" value="Play Time HoldCo">
+                        </div>
+                        <div class="form-field">
+                            <label>Favicon URL (.ico / .png / .svg)</label>
+                            <input type="text" id="metaInputFavicon">
+                        </div>
+                    </div>
+
+                    <div class="form-grid full" style="margin-top: 18px;">
+                        <div class="form-field">
+                            <label>Meta Description</label>
+                            <textarea id="metaInputDescription" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. FULL REST API DOCUMENTATION & LIVE TEST RUNNER -->
+            <div class="tab-pane" id="pane-api-docs">
+                <div class="content-header-row">
+                    <div>
+                        <h2 class="section-headline">Complete REST API Documentation & Console</h2>
+                        <p class="section-subheadline">All endpoints available on the backend server for complete content administration</p>
+                    </div>
+                </div>
+
+                <!-- API 1 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="api-endpoint">/api/content</span>
+                    </div>
+                    <p class="api-desc">Retrieve the complete site payload (meta, hero, portfolio, footer, press, inquiries) in a single JSON response.</p>
+                    <div class="api-code-block">curl -X GET http://localhost:8888/api/content</div>
+                    <button onclick="testApi('/api/content', 'GET', null, 'result-content')" class="btn-try-api">▶ Execute GET /api/content</button>
+                    <pre class="api-result-box" id="result-content"></pre>
+                </div>
+
+                <!-- API 2 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="api-endpoint">/api/portfolio</span>
+                    </div>
+                    <p class="api-desc">Fetch the ordered list of all portfolio startup companies.</p>
+                    <div class="api-code-block">curl -X GET http://localhost:8888/api/portfolio</div>
+                    <button onclick="testApi('/api/portfolio', 'GET', null, 'result-portfolio')" class="btn-try-api">▶ Execute GET /api/portfolio</button>
+                    <pre class="api-result-box" id="result-portfolio"></pre>
+                </div>
+
+                <!-- API 3 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-post">POST</span>
+                        <span class="api-endpoint">/api/portfolio</span>
+                    </div>
+                    <p class="api-desc">Create and append a new portfolio company to the holding showcase.</p>
+                    <div class="api-code-block">curl -X POST http://localhost:8888/api/portfolio -H "Content-Type: application/json" -d '{"name":"Sample AI","tagline":"Next-gen intelligence","url":"https://example.com","logoUrl":"...","bgImageUrl":"..."}'</div>
+                </div>
+
+                <!-- API 4 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-put">PUT</span>
+                        <span class="api-endpoint">/api/portfolio/{id}</span>
+                    </div>
+                    <p class="api-desc">Update any property (name, tagline, website, background image, logo) of an existing startup.</p>
+                    <div class="api-code-block">curl -X PUT http://localhost:8888/api/portfolio/field-ai -H "Content-Type: application/json" -d '{"tagline":"Autonomous brains for field robots"}'</div>
+                </div>
+
+                <!-- API 5 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-delete">DELETE</span>
+                        <span class="api-endpoint">/api/portfolio/{id}</span>
+                    </div>
+                    <p class="api-desc">Delete a company from the portfolio database.</p>
+                    <div class="api-code-block">curl -X DELETE http://localhost:8888/api/portfolio/{id}</div>
+                </div>
+
+                <!-- API 6 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="api-endpoint">/api/hero</span>
+                        <span class="method-badge method-put" style="margin-left: 8px;">PUT</span>
+                        <span class="api-endpoint">/api/hero</span>
+                    </div>
+                    <p class="api-desc">Inspect or modify the hero headlines and brand logo URL.</p>
+                    <div class="api-code-block">curl -X PUT http://localhost:8888/api/hero -H "Content-Type: application/json" -d '{"titlePart1":"At the intersection","titlePart2":"of Sports & Technology"}'</div>
+                    <button onclick="testApi('/api/hero', 'GET', null, 'result-hero')" class="btn-try-api">▶ Execute GET /api/hero</button>
+                    <pre class="api-result-box" id="result-hero"></pre>
+                </div>
+
+                <!-- API 7 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="api-endpoint">/api/press</span>
+                    </div>
+                    <p class="api-desc">Retrieve all media press highlights and external features.</p>
+                    <div class="api-code-block">curl -X GET http://localhost:8888/api/press</div>
+                    <button onclick="testApi('/api/press', 'GET', null, 'result-press')" class="btn-try-api">▶ Execute GET /api/press</button>
+                    <pre class="api-result-box" id="result-press"></pre>
+                </div>
+
+                <!-- API 8 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-get">GET</span>
+                        <span class="api-endpoint">/api/footer</span>
+                        <span class="method-badge method-put" style="margin-left: 8px;">PUT</span>
+                        <span class="api-endpoint">/api/footer</span>
+                    </div>
+                    <p class="api-desc">Inspect or update footer email, logo, and social media handles (Twitter, Instagram, LinkedIn).</p>
+                    <button onclick="testApi('/api/footer', 'GET', null, 'result-footer')" class="btn-try-api">▶ Execute GET /api/footer</button>
+                    <pre class="api-result-box" id="result-footer"></pre>
+                </div>
+
+                <!-- API 9 -->
+                <div class="api-card">
+                    <div class="api-card-header">
+                        <span class="method-badge method-post">POST</span>
+                        <span class="api-endpoint">/api/reset</span>
+                    </div>
+                    <p class="api-desc">Factory reset all data back to the 100% original Play Time VC dataset.</p>
+                    <div class="api-code-block">curl -X POST http://localhost:8888/api/reset</div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODAL: ADD / EDIT COMPANY -->
+    <div class="admin-modal" id="companyModal">
+        <div class="modal-box">
+            <div class="modal-box-header">
+                <h3 class="section-headline" id="companyModalTitle">Add Portfolio Company</h3>
+                <button class="modal-close" onclick="closeCompanyModal()">&times;</button>
+            </div>
+
+            <form id="companyForm" onsubmit="handleSaveCompany(event)">
+                <input type="hidden" id="compEditId">
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Company Name *</label>
+                        <input type="text" id="compName" required placeholder="e.g. FieldAI">
+                    </div>
+                    <div class="form-field">
+                        <label>Website URL *</label>
+                        <input type="url" id="compWebsite" required placeholder="https://fieldai.com/">
+                    </div>
+                </div>
+
+                <div class="form-grid full" style="margin-top: 14px;">
+                    <div class="form-field">
+                        <label>One-line Thesis / Subtitle Description *</label>
+                        <input type="text" id="compTagline" required placeholder="e.g. Autonomous brains for field robots">
+                    </div>
+                </div>
+
+                <div class="form-grid full" style="margin-top: 14px;">
+                    <div class="form-field">
+                        <label>Logo SVG / Image URL *</label>
+                        <input type="url" id="compLogoUrl" required placeholder="https://cdn.prod.website-files.com/...png">
+                    </div>
+                </div>
+
+                <div class="form-grid" style="margin-top: 14px;">
+                    <div class="form-field">
+                        <label>Background Image URL (Optional full bleed)</label>
+                        <input type="url" id="compBgImageUrl" placeholder="https://cdn.prod.website-files.com/...avif">
+                    </div>
+                    <div class="form-field">
+                        <label>CSS Background Class</label>
+                        <select id="compBgClass">
+                            <option value="full-6">full-6 (FieldAI style)</option>
+                            <option value="full-8-copy _9">full-8-copy _9 (Fish Audio style)</option>
+                            <option value="full-8">full-8 (World Labs style)</option>
+                            <option value="full-7">full-7 (Perceptron style)</option>
+                            <option value="full-1">full-1 (Intangible style)</option>
+                            <option value="full-5">full-5 (SuperAnnotate style)</option>
+                            <option value="full">full (Matchday style)</option>
+                            <option value="full-3">full-3 (AC Momento style)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closeCompanyModal()" class="btn-ghost">Cancel</button>
+                    <button type="submit" class="btn-primary-action">Save Company</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD / EDIT PRESS -->
+    <div class="admin-modal" id="pressModal">
+        <div class="modal-box">
+            <div class="modal-box-header">
+                <h3 class="section-headline" id="pressModalTitle">Add Press Article</h3>
+                <button class="modal-close" onclick="closePressModal()">&times;</button>
+            </div>
+
+            <form id="pressForm" onsubmit="handleSavePress(event)">
+                <input type="hidden" id="pressEditId">
+
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label>Publisher / Source Title *</label>
+                        <input type="text" id="pressTitle" required placeholder="e.g. Bloomberg">
+                    </div>
+                    <div class="form-field">
+                        <label>Article URL *</label>
+                        <input type="url" id="pressUrl" required placeholder="https://bloomberg.com/...">
+                    </div>
+                </div>
+
+                <div class="form-grid full" style="margin-top: 14px;">
+                    <div class="form-field">
+                        <label>Summary / Headline Text *</label>
+                        <textarea id="pressText" rows="3" required placeholder="Lionel Messi Launches Investment Firm Targeting Sports and Tech..."></textarea>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="closePressModal()" class="btn-ghost">Cancel</button>
+                    <button type="submit" class="btn-primary-action">Save Article</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div class="toast-notify" id="toast">Notification text</div>
+
+    <script>
+        let currentSiteData = null;
+
+        // FETCH CONTENT VIA REST API WITH STATIC FALLBACK
+        async function fetchContent() {
+            try {
+                const res = await fetch('/api/content');
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.success && json.data) {
+                        currentSiteData = json.data;
+                        renderAdmin();
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("API not reachable, trying static data.json fallback:", e);
+            }
+
+            // Fallback for static hosting (GitHub Pages)
+            try {
+                const res2 = await fetch('data.json');
+                if (res2.ok) {
+                    currentSiteData = await res2.json();
+                    renderAdmin();
+                }
+            } catch (err2) {
+                console.error("Static data.json fallback error:", err2);
+                showToast("Could not load data.json");
+            }
+        }
+
+        // RENDER ADMIN PANES
+        function renderAdmin() {
+            if (!currentSiteData) return;
+            const data = currentSiteData;
+
+            // KPIs
+            const compCount = data.portfolio ? data.portfolio.length : 0;
+            const pressCount = data.press ? data.press.length : 0;
+            document.getElementById('kpiCount').textContent = compCount;
+            document.getElementById('kpiPressCount').textContent = pressCount;
+
+            // Overview Table
+            const ovTable = document.getElementById('overviewTableBody');
+            ovTable.innerHTML = '';
+            (data.portfolio || []).forEach(comp => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong style="color:#ffffff;">${escapeHtml(comp.name)}</strong></td>
+                    <td style="color:var(--text-muted);">${escapeHtml(comp.tagline)}</td>
+                    <td><a href="${comp.url}" target="_blank" style="color:var(--accent-blue);">${escapeHtml(comp.url)}</a></td>
+                    <td><a href="index.html#company-${comp.id}" target="_blank" style="color:#ffffff; text-decoration:underline;">View on Page &rarr;</a></td>
+                `;
+                ovTable.appendChild(tr);
+            });
+
+            // Portfolio Management Table
+            const portTable = document.getElementById('portfolioTableBody');
+            portTable.innerHTML = '';
+            (data.portfolio || []).forEach((comp, idx) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge-pill">#${idx + 1}</span></td>
+                    <td>
+                        <strong style="color:#ffffff;">${escapeHtml(comp.name)}</strong>
+                        <div style="font-size:11px; color:var(--text-dim);">${escapeHtml(comp.bgClass || 'full')}</div>
+                    </td>
+                    <td style="max-width:320px; color:var(--text-muted);">${escapeHtml(comp.tagline)}</td>
+                    <td><a href="${comp.url}" target="_blank" style="color:var(--accent-blue);">${escapeHtml(comp.url)}</a></td>
+                    <td>
+                        <div class="table-actions">
+                            <button onclick="moveCompany(${idx}, -1)" class="btn-table-action" ${idx === 0 ? 'disabled' : ''}>▲</button>
+                            <button onclick="moveCompany(${idx}, 1)" class="btn-table-action" ${idx === data.portfolio.length - 1 ? 'disabled' : ''}>▼</button>
+                            <button onclick="editCompany('${comp.id}')" class="btn-table-action">Edit</button>
+                            <button onclick="deleteCompany('${comp.id}')" class="btn-table-action delete">Delete</button>
+                        </div>
+                    </td>
+                `;
+                portTable.appendChild(tr);
+            });
+
+            // Press Table
+            const pressTable = document.getElementById('pressTableBody');
+            pressTable.innerHTML = '';
+            (data.press || []).forEach(pr => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong style="color:#ffffff;">${escapeHtml(pr.title)}</strong></td>
+                    <td style="max-width:360px; color:var(--text-muted);">${escapeHtml(pr.text)}</td>
+                    <td><a href="${pr.url}" target="_blank" style="color:var(--accent-blue);">Open Link &rarr;</a></td>
+                    <td>
+                        <div class="table-actions">
+                            <button onclick="editPress('${pr.id}')" class="btn-table-action">Edit</button>
+                            <button onclick="deletePress('${pr.id}')" class="btn-table-action delete">Delete</button>
+                        </div>
+                    </td>
+                `;
+                pressTable.appendChild(tr);
+            });
+
+            // Hero inputs
+            if (data.hero) {
+                document.getElementById('heroInputTitle1').value = data.hero.titlePart1 || '';
+                document.getElementById('heroInputTitle2').value = data.hero.titlePart2 || '';
+                document.getElementById('heroInputLogoUrl').value = data.hero.logoUrl || '';
+            }
+
+            // Footer inputs
+            if (data.footer) {
+                document.getElementById('footerInputEmail').value = data.footer.email || '';
+                document.getElementById('footerInputLogo').value = data.footer.logoUrl || '';
+                if (data.footer.socials) {
+                    document.getElementById('footerInputTwitter').value = data.footer.socials.twitter || '';
+                    document.getElementById('footerInputInstagram').value = data.footer.socials.instagram || '';
+                    document.getElementById('footerInputLinkedin').value = data.footer.socials.linkedin || '';
+                }
+            }
+
+            // Meta inputs
+            if (data.meta) {
+                document.getElementById('metaInputTitle').value = data.meta.title || '';
+                document.getElementById('metaInputDescription').value = data.meta.description || '';
+                document.getElementById('metaInputFavicon').value = data.meta.favicon || '';
+            }
+        }
+
+        // SAVE HERO
+        async function saveHeroSettings() {
+            const payload = {
+                titlePart1: document.getElementById('heroInputTitle1').value.trim(),
+                titlePart2: document.getElementById('heroInputTitle2').value.trim(),
+                logoUrl: document.getElementById('heroInputLogoUrl').value.trim()
+            };
+
+            const res = await fetch('/api/hero', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showToast("Hero section updated successfully!");
+                fetchContent();
+            }
+        }
+
+        // SAVE FOOTER
+        async function saveFooterSettings() {
+            const payload = {
+                email: document.getElementById('footerInputEmail').value.trim(),
+                logoUrl: document.getElementById('footerInputLogo').value.trim(),
+                socials: {
+                    twitter: document.getElementById('footerInputTwitter').value.trim(),
+                    instagram: document.getElementById('footerInputInstagram').value.trim(),
+                    linkedin: document.getElementById('footerInputLinkedin').value.trim()
+                }
+            };
+
+            const res = await fetch('/api/footer', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showToast("Footer and socials saved!");
+                fetchContent();
+            }
+        }
+
+        // SAVE META
+        async function saveMetaSettings() {
+            const payload = {
+                title: document.getElementById('metaInputTitle').value.trim(),
+                description: document.getElementById('metaInputDescription').value.trim(),
+                favicon: document.getElementById('metaInputFavicon').value.trim()
+            };
+
+            const res = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                showToast("SEO & Meta tags updated!");
+                fetchContent();
+            }
+        }
+
+        // COMPANY CRUD
+        function openCompanyModal() {
+            document.getElementById('companyForm').reset();
+            document.getElementById('compEditId').value = '';
+            document.getElementById('companyModalTitle').textContent = "Add Portfolio Company";
+            document.getElementById('companyModal').classList.add('active');
+        }
+
+        function closeCompanyModal() {
+            document.getElementById('companyModal').classList.remove('active');
+        }
+
+        function editCompany(id) {
+            const comp = (currentSiteData.portfolio || []).find(c => c.id === id);
+            if (!comp) return;
+
+            document.getElementById('compEditId').value = comp.id;
+            document.getElementById('compName').value = comp.name || '';
+            document.getElementById('compTagline').value = comp.tagline || '';
+            document.getElementById('compWebsite').value = comp.url || '';
+            document.getElementById('compLogoUrl').value = comp.logoUrl || '';
+            document.getElementById('compBgImageUrl').value = comp.bgImageUrl || '';
+            document.getElementById('compBgClass').value = comp.bgClass || 'full';
+
+            document.getElementById('companyModalTitle').textContent = `Edit ${comp.name}`;
+            document.getElementById('companyModal').classList.add('active');
+        }
+
+        async function handleSaveCompany(e) {
+            e.preventDefault();
+            const editId = document.getElementById('compEditId').value;
+            const payload = {
+                name: document.getElementById('compName').value.trim(),
+                tagline: document.getElementById('compTagline').value.trim(),
+                url: document.getElementById('compWebsite').value.trim(),
+                logoUrl: document.getElementById('compLogoUrl').value.trim(),
+                bgImageUrl: document.getElementById('compBgImageUrl').value.trim(),
+                bgClass: document.getElementById('compBgClass').value
+            };
+
+            const method = editId ? 'PUT' : 'POST';
+            const endpoint = editId ? `/api/portfolio/${editId}` : '/api/portfolio';
+
+            const res = await fetch(endpoint, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closeCompanyModal();
+                showToast(editId ? "Updated company!" : "Added new company!");
+                fetchContent();
+            }
+        }
+
+        async function deleteCompany(id) {
+            if (!confirm("Are you sure you want to remove this company?")) return;
+            const res = await fetch(`/api/portfolio/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                showToast("Company deleted.");
+                fetchContent();
+            }
+        }
+
+        async function moveCompany(index, direction) {
+            const port = currentSiteData.portfolio;
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= port.length) return;
+
+            const temp = port[index];
+            port[index] = port[newIndex];
+            port[newIndex] = temp;
+
+            const orderIds = port.map(c => c.id);
+            const res = await fetch('/api/portfolio/reorder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ order: orderIds })
+            });
+
+            if (res.ok) {
+                fetchContent();
+                showToast("Company order updated!");
+            }
+        }
+
+        // PRESS CRUD
+        function openPressModal() {
+            document.getElementById('pressForm').reset();
+            document.getElementById('pressEditId').value = '';
+            document.getElementById('pressModalTitle').textContent = "Add Press Article";
+            document.getElementById('pressModal').classList.add('active');
+        }
+
+        function closePressModal() {
+            document.getElementById('pressModal').classList.remove('active');
+        }
+
+        function editPress(id) {
+            const pr = (currentSiteData.press || []).find(p => p.id === id);
+            if (!pr) return;
+
+            document.getElementById('pressEditId').value = pr.id;
+            document.getElementById('pressTitle').value = pr.title || '';
+            document.getElementById('pressText').value = pr.text || '';
+            document.getElementById('pressUrl').value = pr.url || '';
+
+            document.getElementById('pressModalTitle').textContent = `Edit Press: ${pr.title}`;
+            document.getElementById('pressModal').classList.add('active');
+        }
+
+        async function handleSavePress(e) {
+            e.preventDefault();
+            const editId = document.getElementById('pressEditId').value;
+            const payload = {
+                title: document.getElementById('pressTitle').value.trim(),
+                text: document.getElementById('pressText').value.trim(),
+                url: document.getElementById('pressUrl').value.trim()
+            };
+
+            const method = editId ? 'PUT' : 'POST';
+            const endpoint = editId ? `/api/press/${editId}` : '/api/press';
+
+            const res = await fetch(endpoint, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                closePressModal();
+                showToast("Saved press article!");
+                fetchContent();
+            }
+        }
+
+        async function deletePress(id) {
+            if (!confirm("Delete this press feature?")) return;
+            const res = await fetch(`/api/press/${id}`, { method: 'DELETE' });
+            if (res.ok) {
+                showToast("Press article deleted.");
+                fetchContent();
+            }
+        }
+
+        // RESET DEFAULTS
+        async function handleResetDefaults() {
+            if (!confirm("Reset all content back to 100% Play Time original defaults?")) return;
+            const res = await fetch('/api/reset', { method: 'POST' });
+            if (res.ok) {
+                showToast("Reset to defaults complete.");
+                fetchContent();
+            }
+        }
+
+        // IMPORT FILE
+        function handleImportFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    const res = await fetch('/api/import', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(parsed)
+                    });
+                    if (res.ok) {
+                        showToast("Imported data successfully!");
+                        fetchContent();
+                    }
+                } catch (err) {
+                    alert("Invalid JSON file.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // API TEST CONSOLE RUNNER
+        async function testApi(url, method, body, resultId) {
+            const box = document.getElementById(resultId);
+            box.style.display = 'block';
+            box.textContent = 'Sending request...';
+
+            const opts = { method };
+            if (body) {
+                opts.headers = { 'Content-Type': 'application/json' };
+                opts.body = JSON.stringify(body);
+            }
+
+            try {
+                const start = performance.now();
+                const res = await fetch(url, opts);
+                const duration = Math.round(performance.now() - start);
+                const data = await res.json();
+                box.textContent = `HTTP ${res.status} ${res.statusText} (${duration}ms)\n\n` + JSON.stringify(data, null, 2);
+            } catch (err) {
+                box.textContent = `Error: ${err.message}`;
+            }
+        }
+
+        // TAB SWITCHING
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.sidebar-btn').forEach(el => el.classList.remove('active'));
+
+            const targetPane = document.getElementById(`pane-${tabId}`);
+            if (targetPane) targetPane.classList.add('active');
+
+            const tabTitles = {
+                'overview': 'Dashboard Overview',
+                'hero': 'Hero Section Typography & Logo',
+                'portfolio': 'Portfolio Startups Management',
+                'press': 'Press & Media Highlights',
+                'footer': 'Footer & Social Coordinates',
+                'settings': 'SEO & Meta Settings',
+                'api-docs': 'Complete REST API Documentation & Test Console'
+            };
+
+            document.getElementById('pageTitleDisplay').textContent = tabTitles[tabId] || 'Dashboard';
+
+            document.querySelectorAll('.sidebar-btn').forEach(btn => {
+                if (btn.getAttribute('onclick')?.includes(tabId)) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchContent();
+        });
+    </script>
+</body>
+</html>
